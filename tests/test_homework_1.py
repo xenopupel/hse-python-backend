@@ -1,5 +1,6 @@
 from http import HTTPStatus
 from typing import Any
+from urllib.parse import urlencode
 
 import pytest
 from async_asgi_testclient import TestClient
@@ -44,7 +45,9 @@ async def test_not_found(method: str, path: str):
 )
 async def test_factorial(query: dict[str, Any], status_code: int):
     async with TestClient(app) as client:
-        response = await client.get("/factorial", query_string=query)
+        query_string = urlencode(query)
+        url = f"/factorial?{query_string}" if query_string else "/factorial"
+        response = await client.get(url)
 
     assert response.status_code == status_code
     if status_code == HTTPStatus.OK:
