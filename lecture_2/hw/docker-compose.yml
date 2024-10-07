@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  dev:
+    image: chat_app:latest
+    build:
+      context: . 
+      dockerfile: ./shop_api/Dockerfile
+      target: dev
+    restart: always
+
+  local:
+    image: chat_app:latest
+    build:
+      context: .
+      dockerfile: ./shop_api/Dockerfile
+      target: local
+    restart: always
+    ports:
+      - 8080:8080
+
+  grafana:
+    image: grafana/grafana:latest
+    ports:
+      - 3000:3000
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./settings/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--web.console.libraries=/usr/share/prometheus/console_libraries"
+      - "--web.console.templates=/usr/share/prometheus/consoles"
+    ports:
+      - 9090:9090
+    restart: always
