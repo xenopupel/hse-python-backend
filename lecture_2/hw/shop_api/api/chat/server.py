@@ -2,9 +2,11 @@ import uvicorn
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from typing import List
 import random
+from prometheus_fastapi_instrumentator import Instrumentator
+
 
 app = FastAPI()
-
+Instrumentator().instrument(app).expose(app)
 
 class ConnectionManager:
     def __init__(self):
@@ -41,7 +43,3 @@ async def websocket_endpoint(websocket: WebSocket, chat_name: str):
     except WebSocketDisconnect:
         manager.disconnect(websocket, chat_name)
         await manager.broadcast(f"{username} покинул чат(((.", chat_name)
-
-
-if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8000)
